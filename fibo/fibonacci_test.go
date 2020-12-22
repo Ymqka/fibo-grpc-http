@@ -1,4 +1,4 @@
-package main
+package fibo
 
 import (
 	"reflect"
@@ -22,8 +22,8 @@ func Test_fibonacci(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := fibonacci(tt.args.start, tt.args.stop); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("fibonacci() = %v, want %v", got, tt.want)
+			if got := Fibonacci(tt.args.start, tt.args.stop); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Fibonacci() = %v, want %v", got, tt.want)
 			}
 		})
 	}
