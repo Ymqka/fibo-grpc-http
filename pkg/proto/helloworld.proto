@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package fibogrpchttp;
 
-option go_package = "github.com/Ymqka/fibo-grpc-http/proto";
+option go_package = "github.com/Ymqka/fibo-grpc-http/pkg/proto";
 
 service Greeter {
     rpc SayHello(HelloRequest) returns (HelloReply) {}
