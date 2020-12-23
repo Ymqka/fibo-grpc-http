@@ -1,7 +1,7 @@
 package fibo
 
 // Fibonacci calculcate
-func Fibonacci(start, stop int) []uint64 {
+func Fibonacci(start, stop uint32) []uint64 {
 
 	rv := []uint64{0, 1, 1}
 	return rv

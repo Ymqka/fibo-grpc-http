@@ -4,14 +4,15 @@ package fibogrpchttp;
 
 option go_package = "github.com/Ymqka/fibo-grpc-http/pkg/proto";
 
-service Greeter {
-    rpc SayHello(HelloRequest) returns (HelloReply) {}
+service FibonacciCalculator {
+    rpc GetFiboSequence(FiboRangeRequest) returns (FiboRangeResponse) {}
 }
 
-message HelloRequest {
-    string name = 1;
+message FiboRangeRequest {
+    uint32 start = 1;
+    uint32 stop  = 2;
 }
 
-message HelloReply {
-    string message = 1;
+message FiboRangeResponse {
+    repeated uint64 sequence = 1 [packed=true];
 }
