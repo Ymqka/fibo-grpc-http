@@ -14,5 +14,5 @@ message FiboRangeRequest {
 }
 
 message FiboRangeResponse {
-    repeated uint64 sequence = 1 [packed=true];
+    repeated uint64 sequence = 3 [packed=true];
 }

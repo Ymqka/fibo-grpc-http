@@ -1,0 +1,23 @@
+version: '3.3'
+
+# networks:
+#   default:
+#     external:
+#       name: fibo  
+
+services:
+  fibo:
+    build: .
+    ports:
+      - "11111:11111"
+      - "10000:10000"
+    links:
+      - redis:redis
+    depends_on:
+      - redis
+    container_name: fibonacci-sequence
+
+  redis:
+    image: redis
+    ports:
+      - "6666:6379"

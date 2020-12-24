@@ -3,7 +3,10 @@ module github.com/Ymqka/fibo-grpc-http
 go 1.15
 
 require (
+	github.com/garyburd/redigo v1.6.2
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/golang/protobuf v1.4.3
+	github.com/gomodule/redigo v1.8.3 // indirect
 	golang.org/x/net v0.0.0-20201216054612-986b41b23924 // indirect
 	golang.org/x/sys v0.0.0-20201223074533-0d417f636930 // indirect
 	golang.org/x/text v0.3.4 // indirect

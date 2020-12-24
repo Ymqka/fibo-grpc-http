@@ -7,6 +7,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Ymqka/fibo-grpc-http/pkg/caching"
+	fibo "github.com/Ymqka/fibo-grpc-http/pkg/fibonacci"
+
 	pb "github.com/Ymqka/fibo-grpc-http/pkg/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
@@ -20,7 +23,7 @@ func init() {
 	lis = bufconn.Listen(bufSize)
 	s := grpc.NewServer()
 
-	pb.RegisterFibonacciCalculatorServer(s, new(Server))
+	pb.RegisterFibonacciCalculatorServer(s, &Server{Fibo: fibo.Fibonacci{Cache: caching.NewCacheConnection()}})
 	go func() {
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
@@ -52,8 +55,8 @@ func TestFiboSequence(t *testing.T) {
 		sequenceWant []uint64
 	}{
 		{"fib start 1, stop 3", args{ctx: ctx, fiboRange: &pb.FiboRangeRequest{Start: 1, Stop: 3}}, []uint64{0, 1, 1}},
-		// {"fib start 10, stop 12", args{10, 12}, []uint64{34, 55, 89}},
-		// {"fib start 15, stop 20", args{15, 20}, []uint64{377, 610, 987, 1597, 2584}},
+		{"fib start 10, stop 12", args{ctx: ctx, fiboRange: &pb.FiboRangeRequest{Start: 10, Stop: 12}}, []uint64{34, 55, 89}},
+		{"fib start 15, stop 20", args{ctx: ctx, fiboRange: &pb.FiboRangeRequest{Start: 15, Stop: 20}}, []uint64{377, 610, 987, 1597, 2584, 4181}},
 	}
 
 	for _, tt := range tests {
