@@ -1,7 +1,7 @@
 ## HTTP REST
 1) в корневой папке репозитория сбилдить и запустить контейнер
 ```
-docker-compose build && docker-compose up
+$ docker-compose build && docker-compose up
 ```
 
 2) проверить, что все работает:
