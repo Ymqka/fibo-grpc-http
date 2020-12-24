@@ -1,9 +1,4 @@
-version: '3.3'
-
-# networks:
-#   default:
-#     external:
-#       name: fibo  
+version: '2.0'
 
 services:
   fibo:
