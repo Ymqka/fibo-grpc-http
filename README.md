@@ -7,12 +7,19 @@ docker-compose build && docker-compose up
 $ curl "http://localhost:10000/fibonacci?start=1&stop=3"
 ```
 
-вывод должен быть таким:
+вывод:
+```
 [0 1 1]
+```
 
 ## gRPC client
 1) Нужно поднять контейнер командой из 1 пункта HTTP REST
 2) запустить клиент из корневой папки репозитория
 ```
 $ go run cmd/grpc-client/grpc-client.go
+```
+
+вывод
+```
+2020/12/25 00:08:22 [0 1 1 2 3 5 8 13 21 34]
 ```
