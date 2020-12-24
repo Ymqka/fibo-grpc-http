@@ -25,7 +25,7 @@ func (s *Server) GetFiboSequence(ctx context.Context, hr *pb.FiboRangeRequest) (
 	stop := hr.GetStop()
 	sequence, err := s.Fibo.Fiborange(start, stop)
 	if err != nil {
-		log.Fatalf("failed to get fiborange: %v", err)
+		return &pb.FiboRangeResponse{}, err
 	}
 
 	return &pb.FiboRangeResponse{Sequence: sequence}, nil
@@ -40,7 +40,7 @@ func HandleServer() {
 
 	s := grpc.NewServer()
 
-	pb.RegisterFibonacciCalculatorServer(s, &Server{Fibo: fibo.Fibonacci{Cache: caching.NewCacheConnection()}})
+	pb.RegisterFibonacciCalculatorServer(s, &Server{Fibo: fibo.Fibonacci{Cache: caching.NewCacheConnection("redis:6379")}})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

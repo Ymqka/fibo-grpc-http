@@ -24,7 +24,7 @@ func Test_fibonacci(t *testing.T) {
 
 	f := Fibonacci{}
 
-	f.Cache = caching.NewCacheConnection()
+	f.Cache = caching.NewCacheConnection(":6379")
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

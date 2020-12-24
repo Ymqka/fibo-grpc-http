@@ -14,10 +14,31 @@ type Fibonacci struct {
 
 // Fiborange calculates fibo range
 func (f *Fibonacci) Fiborange(start, stop uint32) ([]uint64, error) {
+	err := validateFiboRange(start, stop)
+	if err != nil {
+		return []uint64{}, err
+	}
+
 	var fiboConsequence []uint64
 
 	for i := start - 1; i < stop; i++ {
 		fiboConsequence = append(fiboConsequence, f.fibo(uint64(i)))
+	}
+
+	return fiboConsequence, nil
+}
+
+// FiborangeNoCache compute fibo without cache
+func (f *Fibonacci) FiborangeNoCache(start, stop uint32) ([]uint64, error) {
+	err := validateFiboRange(start, stop)
+	if err != nil {
+		return []uint64{}, err
+	}
+
+	var fiboConsequence []uint64
+
+	for i := start - 1; i < stop; i++ {
+		fiboConsequence = append(fiboConsequence, f.fiboNoCache(uint64(i)))
 	}
 
 	return fiboConsequence, nil
@@ -41,4 +62,12 @@ func (f *Fibonacci) fibo(n uint64) uint64 {
 	}
 
 	return val
+}
+
+func (f *Fibonacci) fiboNoCache(n uint64) uint64 {
+	if n <= 1 {
+		return n
+	}
+
+	return (f.fibo(n-1) + f.fibo(n-2))
 }

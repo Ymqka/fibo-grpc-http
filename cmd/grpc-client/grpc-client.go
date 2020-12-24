@@ -24,9 +24,9 @@ func handleClient() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	r, err := c.GetFiboSequence(ctx, &pb.FiboRangeRequest{Start: 1, Stop: 3})
+	r, err := c.GetFiboSequence(ctx, &pb.FiboRangeRequest{Start: 1, Stop: 100})
 	if err != nil {
-		log.Fatalf("failed to greet: %v", err)
+		log.Fatalf("failed to get fibo sequence: %v", err)
 	}
 
 	log.Fatalf("%v", r.GetSequence())

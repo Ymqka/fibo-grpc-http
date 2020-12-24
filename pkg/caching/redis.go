@@ -22,8 +22,8 @@ func (cache *Cache) GetUint(key uint64) (uint64, error) {
 }
 
 // NewCacheConnection get cache instance
-func NewCacheConnection() *Cache {
-	redisClient, err := redis.Dial("tcp", "redis:6379")
+func NewCacheConnection(address string) *Cache {
+	redisClient, err := redis.Dial("tcp", address)
 	if err != nil {
 		log.Fatalf("failed to dial redis: %v", err)
 	}
