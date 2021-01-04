@@ -11,8 +11,9 @@ service FibonacciCalculator {
 message FiboRangeRequest {
     uint32 start = 1;
     uint32 stop  = 2;
+    bool force = 3;
 }
 
 message FiboRangeResponse {
-    repeated uint64 sequence = 3 [packed=true];
+    repeated uint64 sequence = 4 [packed=true];
 }
