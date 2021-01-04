@@ -1,7 +1,9 @@
 package caching
 
 import (
+	"errors"
 	"log"
+	"math/big"
 
 	"github.com/garyburd/redigo/redis"
 )
@@ -11,14 +13,24 @@ type Cache struct {
 	redisClient redis.Conn
 }
 
-// SetUint set Uint
-func (cache *Cache) SetUint(key, value uint64) (uint64, error) {
-	return redis.Uint64(cache.redisClient.Do("SET", key, value))
+// SetBigInt set bigint
+func (cache *Cache) SetBigInt(key uint32, value *big.Int) (string, error) {
+	return redis.String(cache.redisClient.Do("SET", key, value))
 }
 
-// GetUint get uint
-func (cache *Cache) GetUint(key uint64) (uint64, error) {
-	return redis.Uint64(cache.redisClient.Do("GET", key))
+// GetBigInt get bigint
+func (cache *Cache) GetBigInt(key uint32) (*big.Int, error) {
+	rv, err := redis.String(cache.redisClient.Do("GET", key))
+	if err != nil {
+		return new(big.Int), err
+	}
+
+	cachedVal, success := new(big.Int).SetString(rv, 10)
+	if success != true {
+		return new(big.Int), errors.New("failed to convert")
+	}
+
+	return cachedVal, nil
 }
 
 // NewCacheConnection get cache instance

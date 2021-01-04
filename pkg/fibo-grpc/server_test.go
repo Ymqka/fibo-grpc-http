@@ -47,27 +47,27 @@ func TestFiboSequence(t *testing.T) {
 
 	type args struct {
 		ctx       context.Context
-		fiboRange *pb.FiboRangeRequest
+		FiboRange *pb.FiboRangeRequest
 	}
 	tests := []struct {
 		name         string
 		args         args
 		sequenceWant []uint64
 	}{
-		{"fib start 1, stop 3", args{ctx: ctx, fiboRange: &pb.FiboRangeRequest{Start: 1, Stop: 3}}, []uint64{0, 1, 1}},
-		{"fib start 10, stop 12", args{ctx: ctx, fiboRange: &pb.FiboRangeRequest{Start: 10, Stop: 12}}, []uint64{34, 55, 89}},
-		{"fib start 15, stop 20", args{ctx: ctx, fiboRange: &pb.FiboRangeRequest{Start: 15, Stop: 20}}, []uint64{377, 610, 987, 1597, 2584, 4181}},
+		{"fib start 1, stop 3", args{ctx: ctx, FiboRange: &pb.FiboRangeRequest{Start: 1, Stop: 3}}, []uint64{0, 1, 1}},
+		{"fib start 10, stop 12", args{ctx: ctx, FiboRange: &pb.FiboRangeRequest{Start: 10, Stop: 12}}, []uint64{34, 55, 89}},
+		{"fib start 15, stop 20", args{ctx: ctx, FiboRange: &pb.FiboRangeRequest{Start: 15, Stop: 20}}, []uint64{377, 610, 987, 1597, 2584, 4181}},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := client.GetFiboSequence(tt.args.ctx, tt.args.fiboRange)
+			got, err := client.GetFiboSequence(tt.args.ctx, tt.args.FiboRange)
 			if err != nil {
 				t.Errorf("failed to get fibonacci sequence: %v", err)
 			}
 
 			sequence := got.GetSequence()
-			start, stop := tt.args.fiboRange.GetStart(), tt.args.fiboRange.GetStop()
+			start, stop := tt.args.FiboRange.GetStart(), tt.args.FiboRange.GetStop()
 
 			if !reflect.DeepEqual(sequence, tt.sequenceWant) {
 				t.Errorf("Fibonacci(start: %v, stop: %v) = %v, want %v",

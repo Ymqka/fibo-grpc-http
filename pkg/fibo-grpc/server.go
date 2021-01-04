@@ -1,7 +1,6 @@
 package fibogrpc
 
 import (
-	"context"
 	"log"
 	"net"
 
@@ -20,16 +19,17 @@ type Server struct {
 }
 
 // GetFiboSequence saying hello
-func (s *Server) GetFiboSequence(ctx context.Context, hr *pb.FiboRangeRequest) (*pb.FiboRangeResponse, error) {
-	start := hr.GetStart()
-	stop := hr.GetStop()
-	sequence, err := s.Fibo.Fiborange(start, stop)
-	if err != nil {
-		return &pb.FiboRangeResponse{}, err
-	}
+// func (s *Server) GetFiboSequence(ctx context.Context, hr *pb.FiboRangeRequest) (*pb.FiboRangeResponse, error) {
+// 	start := hr.GetStart()
+// 	stop := hr.GetStop()
+// 	force := hr.GetForce()
+// 	sequence, err := s.Fibo.FiboRange(fibo.Params{start, stop, force})
+// 	if err != nil {
+// 		return &pb.FiboRangeResponse{}, err
+// 	}
 
-	return &pb.FiboRangeResponse{Sequence: sequence}, nil
-}
+// 	// return &pb.FiboRangeResponse{Sequence: sequence}, nil
+// }
 
 // HandleServer handles server
 func HandleServer() {

@@ -1,7 +1,7 @@
 package http
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -21,35 +21,54 @@ type emptyStartStop struct {
 
 func (e *emptyStartStop) Error() string { return "empty start or stop" }
 
-func parseFiboStartStop(keys url.Values) (uint32, uint32, error) {
+func parseFiboStartStop(keys url.Values) (fibo.Params, error) {
 	rawStart := keys.Get("start")
 	rawStop := keys.Get("stop")
+	rawForce := keys.Get("force")
 
 	if rawStart == "" || rawStop == "" {
-		return 0, 0, &emptyStartStop{}
+		return fibo.Params{}, new(emptyStartStop)
+	}
+
+	var force bool
+	if rawForce == "" {
+		force = false
+	} else if rawForce == "1" {
+		force = true
 	}
 
 	start, _ := strconv.ParseUint(rawStart, 10, 32)
 	stop, _ := strconv.ParseUint(rawStop, 10, 32)
 
-	return uint32(start), uint32(stop), nil
+	fp := fibo.Params{
+		Start: uint32(start),
+		Stop:  uint32(stop),
+		Force: force,
+	}
+
+	return fp, nil
 }
 
 // FiboPage handles requests
 func (server *FiboHTTPServer) FiboPage(w http.ResponseWriter, r *http.Request) {
 	keys := r.URL.Query()
 
-	start, stop, err := parseFiboStartStop(keys)
+	fiboParams, err := parseFiboStartStop(keys)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 	}
 
-	fiboSeries, err := server.Fibo.Fiborange(start, stop)
+	fiboSeries, err := server.Fibo.FiboRange(fiboParams)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 	}
 
-	fmt.Fprintln(w, fiboSeries)
+	sequence, err := json.Marshal(fiboSeries)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(sequence)
 
 	return
 }
@@ -58,28 +77,41 @@ func (server *FiboHTTPServer) FiboPage(w http.ResponseWriter, r *http.Request) {
 func (server *FiboHTTPServer) FiboPageNoCache(w http.ResponseWriter, r *http.Request) {
 	keys := r.URL.Query()
 
-	start, stop, err := parseFiboStartStop(keys)
+	fiboParams, err := parseFiboStartStop(keys)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 	}
 
-	fiboSeries, err := server.Fibo.FiborangeNoCache(start, stop)
+	fiboSeries, err := server.Fibo.FiboRangeNoCache(fiboParams)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 	}
 
-	fmt.Fprintln(w, fiboSeries)
+	sequence, err := json.Marshal(fiboSeries)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(sequence)
 
 	return
 }
 
+func handlers(redisAddr string) http.Handler {
+	FiboServer := FiboHTTPServer{Fibo: fibo.Fibonacci{Cache: caching.NewCacheConnection(redisAddr)}}
+
+	r := http.NewServeMux()
+
+	r.HandleFunc("/fibonacci", FiboServer.FiboPage)
+	r.HandleFunc("/fibonaccinocache", FiboServer.FiboPageNoCache)
+
+	return r
+}
+
 // ServeFiboHTTP connection
-func ServeFiboHTTP() {
+func ServeFiboHTTP(addr, redisAddr string) {
 
-	FiboServer := FiboHTTPServer{Fibo: fibo.Fibonacci{Cache: caching.NewCacheConnection("redis:6379")}}
+	handlers := handlers(redisAddr)
 
-	http.HandleFunc("/fibonacci", FiboServer.FiboPage)
-	http.HandleFunc("/fibonaccinocache", FiboServer.FiboPageNoCache)
-
-	http.ListenAndServe(":10000", nil)
+	http.ListenAndServe(addr, handlers)
 }
