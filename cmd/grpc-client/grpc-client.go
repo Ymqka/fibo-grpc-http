@@ -5,15 +5,16 @@ import (
 	"log"
 	"time"
 
+	fibogrpc "github.com/Ymqka/fibo-grpc-http/pkg/fibo-grpc"
 	pb "github.com/Ymqka/fibo-grpc-http/pkg/proto"
 
 	"google.golang.org/grpc"
 )
 
-const address = "localhost:11111"
+const port = "localhost:11111"
 
 func handleClient() {
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial(port, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("failed to connect: %v", err)
 	}
@@ -29,7 +30,9 @@ func handleClient() {
 		log.Fatalf("failed to get fibo sequence: %v", err)
 	}
 
-	log.Fatalf("%v", r.GetSequence())
+	sequence := fibogrpc.ProtoToFiboSeq(r.GetSequence())
+
+	log.Fatalf("%v", sequence)
 
 	return
 }

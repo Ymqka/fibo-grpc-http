@@ -3,6 +3,7 @@ package fibogrpc
 import (
 	"context"
 	"log"
+	"math/big"
 	"net"
 	"reflect"
 	"testing"
@@ -52,11 +53,26 @@ func TestFiboSequence(t *testing.T) {
 	tests := []struct {
 		name         string
 		args         args
-		sequenceWant []uint64
+		sequenceWant []fibo.FibonacciSequence
 	}{
-		{"fib start 1, stop 3", args{ctx: ctx, FiboRange: &pb.FiboRangeRequest{Start: 1, Stop: 3}}, []uint64{0, 1, 1}},
-		{"fib start 10, stop 12", args{ctx: ctx, FiboRange: &pb.FiboRangeRequest{Start: 10, Stop: 12}}, []uint64{34, 55, 89}},
-		{"fib start 15, stop 20", args{ctx: ctx, FiboRange: &pb.FiboRangeRequest{Start: 15, Stop: 20}}, []uint64{377, 610, 987, 1597, 2584, 4181}},
+		{"fib start 1, stop 3", args{ctx: ctx, FiboRange: &pb.FiboRangeRequest{Start: 1, Stop: 3}}, []fibo.FibonacciSequence{
+			{Number: big.NewInt(1), ID: 1},
+			{Number: big.NewInt(1), ID: 2},
+			{Number: big.NewInt(2), ID: 3},
+		}},
+		{"fib start 10, stop 12", args{ctx: ctx, FiboRange: &pb.FiboRangeRequest{Start: 10, Stop: 12}}, []fibo.FibonacciSequence{
+			{Number: big.NewInt(55), ID: 10},
+			{Number: big.NewInt(89), ID: 11},
+			{Number: big.NewInt(144), ID: 12},
+		}},
+		{"fib start 15, stop 20", args{ctx: ctx, FiboRange: &pb.FiboRangeRequest{Start: 15, Stop: 20}}, []fibo.FibonacciSequence{
+			{Number: big.NewInt(610), ID: 15},
+			{Number: big.NewInt(987), ID: 16},
+			{Number: big.NewInt(1597), ID: 17},
+			{Number: big.NewInt(2584), ID: 18},
+			{Number: big.NewInt(4181), ID: 19},
+			{Number: big.NewInt(6765), ID: 20},
+		}},
 	}
 
 	for _, tt := range tests {
@@ -66,7 +82,8 @@ func TestFiboSequence(t *testing.T) {
 				t.Errorf("failed to get fibonacci sequence: %v", err)
 			}
 
-			sequence := got.GetSequence()
+			sequence := ProtoToFiboSeq(got.GetSequence())
+
 			start, stop := tt.args.FiboRange.GetStart(), tt.args.FiboRange.GetStop()
 
 			if !reflect.DeepEqual(sequence, tt.sequenceWant) {

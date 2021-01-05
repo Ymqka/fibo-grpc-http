@@ -15,5 +15,9 @@ message FiboRangeRequest {
 }
 
 message FiboRangeResponse {
-    repeated uint64 sequence = 4 [packed=true];
+    message SequenceElement {
+        uint32 ID = 1;
+        bytes Number = 2;
+    }
+    repeated SequenceElement Sequence = 1;
 }

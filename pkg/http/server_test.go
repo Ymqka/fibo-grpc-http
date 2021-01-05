@@ -37,10 +37,10 @@ func TestRouting_FiboPage(t *testing.T) {
 	json.Unmarshal(body, &fiboSeq)
 
 	fiboSeqExpect := []fibo.FibonacciSequence{
-		{ID: 0, Num: big.NewInt(0)},
-		{ID: 1, Num: big.NewInt(1)},
-		{ID: 2, Num: big.NewInt(1)},
-		{ID: 3, Num: big.NewInt(2)},
+		{ID: 0, Number: big.NewInt(0)},
+		{ID: 1, Number: big.NewInt(1)},
+		{ID: 2, Number: big.NewInt(1)},
+		{ID: 3, Number: big.NewInt(2)},
 	}
 
 	if !reflect.DeepEqual(fiboSeq, fiboSeqExpect) {
@@ -72,10 +72,10 @@ func TestRouting_FiboPageNoCache(t *testing.T) {
 	json.Unmarshal(body, &fiboSeq)
 
 	fiboSeqExpect := []fibo.FibonacciSequence{
-		{ID: 0, Num: big.NewInt(0)},
-		{ID: 1, Num: big.NewInt(1)},
-		{ID: 2, Num: big.NewInt(1)},
-		{ID: 3, Num: big.NewInt(2)},
+		{ID: 0, Number: big.NewInt(0)},
+		{ID: 1, Number: big.NewInt(1)},
+		{ID: 2, Number: big.NewInt(1)},
+		{ID: 3, Number: big.NewInt(2)},
 	}
 
 	if !reflect.DeepEqual(fiboSeq, fiboSeqExpect) {

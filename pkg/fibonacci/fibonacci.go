@@ -15,8 +15,8 @@ type Fibonacci struct {
 
 // FibonacciSequence for storing nums
 type FibonacciSequence struct {
-	ID  uint32   `json:"ID"`
-	Num *big.Int `json:"Number"`
+	ID     uint32   `json:"ID"`
+	Number *big.Int `json:"Number"`
 }
 
 // Params for fibo funcs
@@ -52,8 +52,8 @@ func (f *Fibonacci) FiboRange(p Params) ([]FibonacciSequence, error) {
 
 	for i := p.Start; i <= p.Stop; i++ {
 		fs := FibonacciSequence{
-			ID:  i,
-			Num: f.fibo(i),
+			ID:     i,
+			Number: f.fibo(i),
 		}
 
 		fiboConsequence = append(fiboConsequence, fs)
@@ -73,8 +73,8 @@ func (f *Fibonacci) FiboRangeNoCache(p Params) ([]FibonacciSequence, error) {
 
 	for i := p.Start; i <= p.Stop; i++ {
 		fs := FibonacciSequence{
-			ID:  i,
-			Num: f.fiboNoCache(i),
+			ID:     i,
+			Number: f.fiboNoCache(i),
 		}
 
 		fiboConsequence = append(fiboConsequence, fs)

@@ -118,11 +118,11 @@ func handlers(redisAddr string) http.Handler {
 }
 
 // ServeFiboHTTP connection
-func ServeFiboHTTP(addr, redisAddr string) {
+func ServeFiboHTTP(port, redisAddr string) {
 
 	handlers := handlers(redisAddr)
 
-	err := http.ListenAndServe(addr, logRequest(handlers))
+	err := http.ListenAndServe(port, logRequest(handlers))
 	if err != nil {
 		log.Fatal(err)
 	}
