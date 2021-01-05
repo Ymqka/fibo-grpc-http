@@ -14,7 +14,6 @@ curl "http://localhost:10000/fibonacci?start=1&stop=3"
 [{"ID":1,"Number":1},{"ID":2,"Number":1},{"ID":3,"Number":2}]
 ```
 
-ограничения:
 выставлено ограничение на стоп в 111111, чтобы обойти ограничение нужно добавить флажок force=1
 ```
 curl "http://localhost:10000/fibonacci?start=111112&stop=111112&force=1"
