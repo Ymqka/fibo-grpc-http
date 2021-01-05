@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	fibogrpc.HandleServer()
+	fibogrpc.HandleServer(":11111", ":6379")
 }
