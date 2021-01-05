@@ -26,6 +26,12 @@ type Params struct {
 }
 
 func (f *Fibonacci) warmFiboCache(p Params) {
+	_, errStart := f.Cache.GetBigInt(p.Start)
+	_, errStop := f.Cache.GetBigInt(p.Stop)
+	if !errors.Is(errStart, redis.ErrNil) && !errors.Is(errStop, redis.ErrNil) {
+		return
+	}
+
 	a, b := big.NewInt(0), big.NewInt(1)
 
 	for i := uint32(0); i <= p.Stop; i++ {
