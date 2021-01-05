@@ -87,9 +87,18 @@ func TestRouting_FiboError_EmptyStartStop(t *testing.T) {
 	srv := httptest.NewServer(handlers(":6379"))
 	defer srv.Close()
 
-	res, err := http.Get(fmt.Sprintf("%s/fibonacci?start=0", srv.URL))
-	if err != nil {
-		t.Error(err)
+	res, _ := http.Get(fmt.Sprintf("%s/fibonacci?start=0", srv.URL))
+	if res.StatusCode != 400 {
+		t.Error("response code for empty params is not 400")
 	}
-	t.Error(res.Status)
+}
+
+func TestRouting_FiboError_ForceFlag(t *testing.T) {
+	srv := httptest.NewServer(handlers(":6379"))
+	defer srv.Close()
+
+	res, _ := http.Get(fmt.Sprintf("%s/fibonacci?start=0&stop=999999", srv.URL))
+	if res.StatusCode == http.StatusOK {
+		t.Error("stop higher than 10000 without force flag returned 200 code ")
+	}
 }

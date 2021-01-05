@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -55,17 +56,22 @@ func (server *FiboHTTPServer) FiboPage(w http.ResponseWriter, r *http.Request) {
 
 	fiboParams, err := parseFiboStartStop(keys)
 	if err != nil {
+		log.Printf("failed to parse params, %v", err)
 		http.Error(w, err.Error(), 400)
+		return
 	}
 
 	fiboSeries, err := server.Fibo.FiboRange(fiboParams)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		log.Printf("failed to get sequence, %v", err)
+		http.Error(w, err.Error(), 500)
+		return
 	}
 
 	sequence, err := json.Marshal(fiboSeries)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		log.Printf("failed to marshal json, %v", err)
+		http.Error(w, err.Error(), 500)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(sequence)
@@ -79,17 +85,20 @@ func (server *FiboHTTPServer) FiboPageNoCache(w http.ResponseWriter, r *http.Req
 
 	fiboParams, err := parseFiboStartStop(keys)
 	if err != nil {
+		log.Printf("failed to parse params, %v", err)
 		http.Error(w, err.Error(), 400)
 	}
 
 	fiboSeries, err := server.Fibo.FiboRangeNoCache(fiboParams)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		log.Printf("failed to get sequence, %v", err)
+		http.Error(w, err.Error(), 500)
 	}
 
 	sequence, err := json.Marshal(fiboSeries)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		log.Printf("failed to marshal json, %v", err)
+		http.Error(w, err.Error(), 500)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(sequence)
@@ -113,5 +122,10 @@ func ServeFiboHTTP(addr, redisAddr string) {
 
 	handlers := handlers(redisAddr)
 
-	http.ListenAndServe(addr, handlers)
+	err := http.ListenAndServe(addr, logRequest(handlers))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return
 }
