@@ -10,7 +10,7 @@ func TestCache_SetBigInt(t *testing.T) {
 	cache := NewCacheConnection(":6379")
 
 	want := big.NewInt(10)
-	var id uint32 = 10
+	var id uint32 = 500
 
 	cache.SetBigInt(id, want)
 
