@@ -1,33 +1,38 @@
 package fibo
 
 // StopLesserThanStart stop < start
-type stopLesserThanStart struct{}
-
-func (s *stopLesserThanStart) Error() string { return "stop is higher than start" }
-
-// TooSmallNumber uint64 can't hold fibonacci number higher than 90
-type tooSmallNumber struct{}
-
-func (s *tooSmallNumber) Error() string { return "cannot handle number higher than 90" }
-
-type zeroStartIsNotAllowed struct {
+type startHigherThanStop struct {
+	start, stop uint32
 }
 
-func (s *zeroStartIsNotAllowed) Error() string {
-	return "start should be >= 1 (first sequence idx = 1)"
+func (s *startHigherThanStop) Error() string { return "start is higher than stop" }
+
+// tooHigh prevent user asking for too big number
+type tooHigh struct{}
+
+func (s *tooHigh) Error() string {
+	return "failed to make request, stop is higher than 111111 and force flag is not used"
 }
 
-func validateFiboRange(start, stop uint32) error {
-	if stop < start {
-		return new(stopLesserThanStart)
+type lessThanZeroIsNotAllowed struct {
+}
+
+func (s *lessThanZeroIsNotAllowed) Error() string {
+	return "less than zero is not allowed"
+}
+
+func validateFiboParams(p Params) error {
+
+	if p.Stop < p.Start {
+		return new(startHigherThanStop)
 	}
 
-	if stop > 90 {
-		return new(tooSmallNumber)
+	if p.Stop >= 111111 && p.Force == false {
+		return new(tooHigh)
 	}
 
-	if start == 0 {
-		return new(zeroStartIsNotAllowed)
+	if p.Start < 0 {
+		return new(lessThanZeroIsNotAllowed)
 	}
 
 	return nil

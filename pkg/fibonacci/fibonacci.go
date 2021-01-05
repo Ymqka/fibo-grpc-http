@@ -1,7 +1,8 @@
 package fibo
 
 import (
-	"log"
+	"errors"
+	"math/big"
 
 	"github.com/Ymqka/fibo-grpc-http/pkg/caching"
 	"github.com/garyburd/redigo/redis"
@@ -12,62 +13,103 @@ type Fibonacci struct {
 	Cache *caching.Cache
 }
 
-// Fiborange calculates fibo range
-func (f *Fibonacci) Fiborange(start, stop uint32) ([]uint64, error) {
-	err := validateFiboRange(start, stop)
-	if err != nil {
-		return []uint64{}, err
+// FibonacciSequence for storing nums
+type FibonacciSequence struct {
+	ID     uint32   `json:"ID"`
+	Number *big.Int `json:"Number"`
+}
+
+// Params for fibo funcs
+type Params struct {
+	Start, Stop uint32
+	Force       bool
+}
+
+func (f *Fibonacci) warmFiboCache(p Params) {
+	_, errStart := f.Cache.GetBigInt(p.Start)
+	_, errStop := f.Cache.GetBigInt(p.Stop)
+	if !errors.Is(errStart, redis.ErrNil) && !errors.Is(errStop, redis.ErrNil) {
+		return
 	}
 
-	var fiboConsequence []uint64
+	a, b := big.NewInt(0), big.NewInt(1)
 
-	for i := start - 1; i < stop; i++ {
-		fiboConsequence = append(fiboConsequence, f.fibo(uint64(i)))
+	for i := uint32(0); i <= p.Stop; i++ {
+
+		f.Cache.SetBigInt(i, a)
+
+		a.Add(a, b)
+		a, b = b, a
+	}
+
+	return
+}
+
+// FiboRange calculates fibo range
+func (f *Fibonacci) FiboRange(p Params) ([]FibonacciSequence, error) {
+	err := validateFiboParams(p)
+	if err != nil {
+		return []FibonacciSequence{}, err
+	}
+
+	f.warmFiboCache(p)
+
+	var fiboConsequence []FibonacciSequence
+
+	for i := p.Start; i <= p.Stop; i++ {
+		fs := FibonacciSequence{
+			ID:     i,
+			Number: f.fibo(i),
+		}
+
+		fiboConsequence = append(fiboConsequence, fs)
 	}
 
 	return fiboConsequence, nil
 }
 
-// FiborangeNoCache compute fibo without cache
-func (f *Fibonacci) FiborangeNoCache(start, stop uint32) ([]uint64, error) {
-	err := validateFiboRange(start, stop)
+// FiboRangeNoCache compute fibo without cache
+func (f *Fibonacci) FiboRangeNoCache(p Params) ([]FibonacciSequence, error) {
+	err := validateFiboParams(p)
 	if err != nil {
-		return []uint64{}, err
+		return []FibonacciSequence{}, err
 	}
 
-	var fiboConsequence []uint64
+	var fiboConsequence []FibonacciSequence
 
-	for i := start - 1; i < stop; i++ {
-		fiboConsequence = append(fiboConsequence, f.fiboNoCache(uint64(i)))
+	for i := p.Start; i <= p.Stop; i++ {
+		fs := FibonacciSequence{
+			ID:     i,
+			Number: f.fiboNoCache(i),
+		}
+
+		fiboConsequence = append(fiboConsequence, fs)
 	}
 
 	return fiboConsequence, nil
 }
 
-func (f *Fibonacci) fibo(n uint64) uint64 {
-	if n <= 1 {
-		return n
+func (f *Fibonacci) fiboNoCache(n uint32) *big.Int {
+	a, b := big.NewInt(0), big.NewInt(1)
+
+	for i := uint32(0); i < n; i++ {
+		a.Add(a, b)
+		a, b = b, a
 	}
 
-	val, err := f.Cache.GetUint(n)
-
-	if err == redis.ErrNil {
-		result := (f.fibo(n-1) + f.fibo(n-2))
-		f.Cache.SetUint(n, result)
-		return result
-	}
-
-	if err != nil {
-		log.Fatalf("failed to get from cache: %v", err)
-	}
-
-	return val
+	return a
 }
 
-func (f *Fibonacci) fiboNoCache(n uint64) uint64 {
-	if n <= 1 {
-		return n
+func (f *Fibonacci) fibo(n uint32) *big.Int {
+
+	cachedVal, err := f.Cache.GetBigInt(n)
+	if !errors.Is(err, redis.ErrNil) {
+		return cachedVal
 	}
 
-	return (f.fibo(n-1) + f.fibo(n-2))
+	fiboNumber := f.fiboNoCache(n)
+
+	f.Cache.SetBigInt(n, fiboNumber)
+
+	return fiboNumber
 }
