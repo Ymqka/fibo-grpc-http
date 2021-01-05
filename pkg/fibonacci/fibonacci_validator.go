@@ -11,7 +11,7 @@ func (s *startHigherThanStop) Error() string { return "start is higher than stop
 type tooHigh struct{}
 
 func (s *tooHigh) Error() string {
-	return "failed to make request, stop is higher than 10 000 and force flag is not used"
+	return "failed to make request, stop is higher than 111111 and force flag is not used"
 }
 
 type lessThanZeroIsNotAllowed struct {
@@ -27,7 +27,7 @@ func validateFiboParams(p Params) error {
 		return new(startHigherThanStop)
 	}
 
-	if p.Stop > 10000 && p.Force == false {
+	if p.Stop >= 111111 && p.Force == false {
 		return new(tooHigh)
 	}
 

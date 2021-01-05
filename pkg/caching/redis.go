@@ -1,7 +1,6 @@
 package caching
 
 import (
-	"errors"
 	"log"
 	"math/big"
 
@@ -14,21 +13,18 @@ type Cache struct {
 }
 
 // SetBigInt set bigint
-func (cache *Cache) SetBigInt(key uint32, value *big.Int) (string, error) {
-	return redis.String(cache.redisClient.Do("SET", key, value))
+func (cache *Cache) SetBigInt(key uint32, value *big.Int) ([]byte, error) {
+	return redis.Bytes(cache.redisClient.Do("SET", key, value.Bytes()))
 }
 
 // GetBigInt get bigint
 func (cache *Cache) GetBigInt(key uint32) (*big.Int, error) {
-	rv, err := redis.String(cache.redisClient.Do("GET", key))
+	rv, err := redis.Bytes(cache.redisClient.Do("GET", key))
 	if err != nil {
 		return new(big.Int), err
 	}
 
-	cachedVal, success := new(big.Int).SetString(rv, 10)
-	if success != true {
-		return new(big.Int), errors.New("failed to convert")
-	}
+	cachedVal := new(big.Int).SetBytes(rv)
 
 	return cachedVal, nil
 }
